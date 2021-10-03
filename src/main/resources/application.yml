@@ -1,0 +1,18 @@
+spring:
+  data:
+    mongodb:
+#      username: root
+#      password: root
+      database: dtwitter
+      port: 27017
+      host: localhost
+
+  kafka:
+    bootstrap-servers:
+        - localhost:9092
+    consumer:
+      group-id: dtwitter
+      auto-offset-reset: earliest
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonSerializer
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

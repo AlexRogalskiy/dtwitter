@@ -21,6 +21,8 @@ data class UserRecommendMessages(
     val posts: MutableList<Post> = mutableListOf()
 )
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+
 data class Channel(
     val id: ChannelPath,
     var peopleNumber: Int = 0,
@@ -28,7 +30,13 @@ data class Channel(
     val status: ChannelStatus = ChannelStatus.PENDING
 )
 
-typealias ChannelPath = String
+data class UserChannelMessage(
+    val id: UUID,
+    val messageId: UUID,
+    val status: UserMessageStatus = UserMessageStatus.NOT_READ
+)
+
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 data class Post(
     val userId: UUID,
@@ -47,25 +55,3 @@ data class RankedPost(
     var thumbUp: Int = 0,
     var thumbDown: Int = 0,
 )
-
-data class UserChannelMessage(
-    val id: UUID,
-    val messageId: UUID,
-    val status: UserMessageStatus = UserMessageStatus.NOT_READ
-)
-
-enum class ChannelStatus {
-    PENDING,
-    CREATED,
-    DELETED
-}
-
-enum class UserMessageStatus {
-    READ,
-    NOT_READ
-}
-
-enum class RATE {
-    UP,
-    DOWN
-}
