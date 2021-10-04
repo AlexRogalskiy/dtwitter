@@ -22,11 +22,11 @@ data class User(
 @Document(collation = "user_read_post")
 data class UserReadPost(
     @Id
-    val id: PostId,
+    val id: UserReadPostId,
     val timestamp: Timestamp
 )
 
-data class PostId(
+data class UserReadPostId(
     val userId: UUID,
     val channelId: ChannelPath,
     val postId: UUID,
@@ -39,7 +39,7 @@ data class Channel(
     @Id
     val id: ChannelPath,
     val owners: List<UUID> = listOf(), // list of user ids
-    val peopleNumber: Int = 0,
+    val peopleNumber: Int = 1,
     val subChannels: List<UUID> = listOf(),
     val status: ChannelStatus = ChannelStatus.PENDING
 )
@@ -58,9 +58,15 @@ data class Post(
     val thumbUp: Int = 0,
     val thumbDown: Int = 0,
 
-    val content: Content
+    val postContent: PostContent
 )
 
-data class Content(
+data class PostId(
+    val userId: UUID,
+    val channelId: ChannelPath,
+    val postId: UUID,
+)
+
+data class PostContent(
     val text: String
 )

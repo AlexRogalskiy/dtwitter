@@ -26,4 +26,4 @@ class MainConfiguration {
 
 }
 
-val POST_RATE_TOPIC_NAME = "post_rate_topic"
+const val POST_RATE_TOPIC_NAME = "post_rate_topic"

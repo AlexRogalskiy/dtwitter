@@ -13,7 +13,7 @@ enum class UserMessageStatus {
     NOT_READ
 }
 
-enum class RATE {
+enum class POST_RATE {
     UP,
     DOWN
 }

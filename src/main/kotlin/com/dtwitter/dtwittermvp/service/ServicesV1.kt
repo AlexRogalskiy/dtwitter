@@ -3,7 +3,7 @@ package com.dtwitter.dtwittermvp.service
 import com.dtwitter.dtwittermvp.model.Channel
 import com.dtwitter.dtwittermvp.model.ChannelPath
 import com.dtwitter.dtwittermvp.model.Post
-import com.dtwitter.dtwittermvp.model.RATE
+import com.dtwitter.dtwittermvp.model.POST_RATE
 import com.dtwitter.dtwittermvp.model.RankedPost
 import com.dtwitter.dtwittermvp.model.User
 import java.util.*
@@ -74,10 +74,10 @@ class MainService {
         return RankedPost(post.id, toSeeCount, post.timestamp)
     }
 
-    fun ratePost(userId: UUID, channelId: ChannelPath, postId: UUID, rate: RATE) {
+    fun ratePost(userId: UUID, channelId: ChannelPath, postId: UUID, POSTRate: POST_RATE) {
         val post = channelRankedPosts[channelId]?.find { it.postId == postId } ?: throw IllegalArgumentException("Cannot find post.")
         post.alreadySeeCount++
-        if (rate == RATE.UP) {
+        if (POSTRate == POST_RATE.UP) {
             post.thumbUp++
         } else {
             post.thumbDown++

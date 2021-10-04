@@ -1,6 +1,6 @@
 package com.dtwitter.dtwittermvp
 
-import com.dtwitter.dtwittermvp.model.RATE
+import com.dtwitter.dtwittermvp.model.POST_RATE
 import com.dtwitter.dtwittermvp.service.MainService
 
 fun main() {
@@ -12,7 +12,7 @@ fun main() {
 
     val recommendedPosts = mainService.getRelevantChannelMessages(user.id, channel.id)
     println(recommendedPosts)
-    mainService.ratePost(user.id, channel.id, recommendedPosts[0].id, RATE.UP)
+    mainService.ratePost(user.id, channel.id, recommendedPosts[0].id, POST_RATE.UP)
 }
 
 object Test1 {
@@ -32,12 +32,12 @@ object Test1 {
 
         val recommendedPosts = mainService.getRelevantChannelMessages(user.id, channel.id)
         assert(recommendedPosts.size == 1)
-        mainService.ratePost(user.id, channel.id, recommendedPosts[0].id, RATE.UP)
+        mainService.ratePost(user.id, channel.id, recommendedPosts[0].id, POST_RATE.UP)
         println(mainService.channelRankedPosts)
 
         val recommendedPosts2 = mainService.getRelevantChannelMessages(user2.id, channel.id)
         assert(recommendedPosts2.size == 1)
-        mainService.ratePost(user2.id, channel.id, recommendedPosts2[0].id, RATE.DOWN)
+        mainService.ratePost(user2.id, channel.id, recommendedPosts2[0].id, POST_RATE.DOWN)
         println(mainService.channelRankedPosts)
 
         mainService.rerank()
