@@ -23,7 +23,7 @@ data class User(
 data class UserReadPost(
     @Id
     val id: UserReadPostId,
-    val timestamp: Timestamp
+    val timestamp: Instant
 )
 
 data class UserReadPostId(
@@ -52,7 +52,7 @@ data class Post(
     val id: PostId,
     val toSeeCount: Int,
 
-    val timestamp: Timestamp = Timestamp.from(Instant.now()),
+    val timestamp: Instant = Instant.now(),
     val alreadySeeCount: Int = 0,
 
     val thumbUp: Int = 0,

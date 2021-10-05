@@ -27,3 +27,4 @@ class MainConfiguration {
 }
 
 const val POST_RATE_TOPIC_NAME = "post_rate_topic"
+const val POST_TO_SEE_UPDATE_TOPIC_NAME = "post_to_see_update_topic"

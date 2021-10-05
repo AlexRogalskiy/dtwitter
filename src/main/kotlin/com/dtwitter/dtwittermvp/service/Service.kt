@@ -15,10 +15,8 @@ import com.dtwitter.dtwittermvp.repository.UserReadPostRepository
 import com.dtwitter.dtwittermvp.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import java.sql.Timestamp
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 import java.util.*
 import javax.annotation.PostConstruct
 
@@ -29,21 +27,25 @@ class Service(val postRepo: PostRepository,
               val userReadPostRepository: UserReadPostRepository,
               val postRateProducer: PostRateProducer) {
 
-//    @PostConstruct
+    @PostConstruct
     fun init() {
         val postContent = PostContent("test text")
         val postId = { PostId(UUID.randomUUID(), "/test", UUID.randomUUID()) }
         val post = { shift: Int ->
             Post(
                 id = postId(),
-                timestamp = Timestamp.from(Instant.now().minus(shift.toLong(), ChronoUnit.MINUTES)),
+                timestamp = Instant.now().minus(shift.toLong(), ChronoUnit.MINUTES),
                 toSeeCount = 20,
                 postContent = postContent,
                 thumbUp = shift
             )
         }
 
-        postRepo.saveAll((1..10).map { post(it) })
+        val posts = (1..10).map { post(it) }
+        postRepo.saveAll(posts)
+
+        println("========================")
+        println(postRepo.findPostToRead("/test", listOf(posts[0].id.postId), PageRequest.of(0, 5)).content)
     }
 
     fun createUser(username: String) {
