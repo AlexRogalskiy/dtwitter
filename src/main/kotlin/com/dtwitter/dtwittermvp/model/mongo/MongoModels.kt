@@ -19,7 +19,7 @@ data class User(
     val avgRate: Double = 0.0
 )
 
-@Document(collation = "user_read_post")
+@Document(collection = "user_read_post")
 data class UserReadPost(
     @Id
     val id: UserReadPostId,
@@ -58,6 +58,7 @@ data class Post(
     val thumbUp: Int = 0,
     val thumbDown: Int = 0,
 
+    val stopPropagation: Boolean = false,
     val postContent: PostContent
 )
 

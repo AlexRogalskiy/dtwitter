@@ -26,6 +26,6 @@ interface ChannelRepository: MongoRepository<Channel, ChannelPath>
 
 @Repository
 interface PostRepository: MongoRepository<Post, PostId> {
-    @Query(value = "{\"_id.channelId\": ?0, \$expr:{\$gt:[\"\$toSeeCount\", \"\$alreadySeeCount\"]}, \"_id.postId\": {\$nin: [ ?1 ]}}", sort = "{ timestamp: -1 }")
-    fun findPostToRead(channelPath: ChannelPath, excludedPostIds: List<UUID>, page: Pageable): Page<Post>
+    @Query(value = "{\"_id.userId\": {\$ne: ?0}, \"_id.channelId\": ?1, \$expr:{\$gt:[\"\$toSeeCount\", \"\$alreadySeeCount\"]}, \"_id.postId\": {\$nin: [ ?2 ]}}", sort = "{ timestamp: -1 }")
+    fun findPostToRead(userId: UUID, channelPath: ChannelPath, excludedPostIds: List<UUID>, page: Pageable): Page<Post>
 }

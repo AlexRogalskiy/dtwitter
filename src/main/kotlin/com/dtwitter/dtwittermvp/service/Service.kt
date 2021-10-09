@@ -15,10 +15,9 @@ import com.dtwitter.dtwittermvp.repository.UserReadPostRepository
 import com.dtwitter.dtwittermvp.repository.UserRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.annotation.PostConstruct
+import kotlin.math.max
 
 @Service
 class Service(val postRepo: PostRepository,
@@ -29,39 +28,45 @@ class Service(val postRepo: PostRepository,
 
     @PostConstruct
     fun init() {
-        val postContent = PostContent("test text")
-        val postId = { PostId(UUID.randomUUID(), "/test", UUID.randomUUID()) }
-        val post = { shift: Int ->
-            Post(
-                id = postId(),
-                timestamp = Instant.now().minus(shift.toLong(), ChronoUnit.MINUTES),
-                toSeeCount = 20,
-                postContent = postContent,
-                thumbUp = shift
-            )
-        }
+        val user1 = createUser("user1")
+        val channel = createChannel(user1.id, "sport")
+        changeChannels(user1.id, setOf(channel.id))
 
-        val posts = (1..10).map { post(it) }
-        postRepo.saveAll(posts)
+        val user2 = createUser("user2")
+        changeChannels(user2.id, setOf(channel.id))
 
-        println("========================")
-        println(postRepo.findPostToRead("/test", listOf(posts[0].id.postId), PageRequest.of(0, 5)).content)
-    }
+        writePost(user1.id, channel.id, PostContent("test text"))
 
-    fun createUser(username: String) {
+        val posts1 = getPosts(user1.id, channel.id)
+        println(posts1)
+
+        val posts2 = getPosts(user2.id, channel.id)
+        println(posts2)
+
+        println(postRepo.findAll())
+        ratePost(user2.id, posts2[0].id, POST_RATE.UP)
+        Thread.sleep(3000)
+        println("Remove after wait")
+        println(postRepo.findAll())
+
+//        postRepo.deleteAll()
+  }
+
+    fun createUser(username: String): User {
         val user = User(username = username)
-        userRepository.save(user)
+        return userRepository.save(user)
     }
 
-    fun createChannel(userOwnerId: UUID, channelName: String, parent: ChannelPath = "") {
+    fun createChannel(userOwnerId: UUID, channelName: String, parent: ChannelPath = ""): Channel {
         val channel = Channel("$parent/$channelName")
-        channelRepository.save(channel)
+        val createdChannel = channelRepository.save(channel)
         val user = userRepository.findById(userOwnerId).orElseThrow { IllegalArgumentException() }
         userRepository.save(
             user.copy(
                 channelRates = user.channelRates + (channel.id to 0.0),
                 readingChannels = user.readingChannels + channel.id)
         )
+        return createdChannel
     }
 
     fun changeChannels(userId: UUID, channelIds: Set<ChannelPath>) {
@@ -71,25 +76,34 @@ class Service(val postRepo: PostRepository,
         userRepository.save(user.copy(readingChannels = channelIds, channelRates = existingChannelRates + newChannelRates))
     }
 
+    fun deleteChannels() {
+        channelRepository.deleteAll()
+    }
+
+    fun getChannels(): List<Channel> {
+        return channelRepository.findAll()
+    }
+
     fun ratePost(userId: UUID, postId: PostId, postRate: POST_RATE) {
         postRateProducer.sendPost(PostRate(userId, postId, postRate))
     }
 
     fun getPosts(userId: UUID, channelPath: ChannelPath): List<Post> {
         val readPosts = userReadPostRepository.findByIdUserIdAndIdChannelId(userId, channelPath)
-        val posts = postRepo.findPostToRead(channelPath, readPosts.map { it.id.postId }, PageRequest.of(0, 5))
+        val posts = postRepo.findPostToRead(userId, channelPath, readPosts.map { it.id.postId }, PageRequest.of(0, 5))
         return postRepo.saveAll(posts.map { it.copy(alreadySeeCount = it.alreadySeeCount + 1) })
     }
 
-    fun writePost(userId: UUID, channelPath: ChannelPath, content: PostContent) {
+    fun writePost(userId: UUID, channelPath: ChannelPath, content: PostContent): Post {
         val postId = PostId(userId, channelPath, UUID.randomUUID())
         val toSeeCount = calculatePostSeeCount(userId, channelPath)
         val post = Post(postId, toSeeCount, postContent = content)
-        postRepo.save(post)
+        return postRepo.save(post)
     }
 
-    fun calculatePostSeeCount(userId: UUID, channelPath: ChannelPath): Int {
-        return 10 // TODO
+    private fun calculatePostSeeCount(userId: UUID, channelPath: ChannelPath): Int {
+        val channel = channelRepository.findById(channelPath).orElseThrow { IllegalArgumentException() }
+        return max(1, channel.peopleNumber * (1 / 10))
     }
 
 }
